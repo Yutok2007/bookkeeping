@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app">Pocket Ledger</string><string name="home">Home</string><string name="chart">Chart</string><string name="report">Report</string><string name="profile">Profile</string>
+    <string name="income">Income</string><string name="expense">Expense</string><string name="balance">Balance</string><string name="this_month">This month</string>
+    <string name="no_entries">No entries yet</string><string name="add_first">Tap + to add your first transaction</string><string name="search">Search purpose, note, category, or account</string><string name="all">All</string>
+    <string name="add_entry">Add Transaction</string><string name="sentence">Quick Entry</string><string name="manual">Manual Entry</string><string name="parse">Parse</string><string name="speak">Voice input</string><string name="ime_voice_hint">Use the microphone button on your current keyboard for voice input.</string>
+    <string name="sentence_hint">For example: Yesterday I spent 32 yuan on lunch using WeChat</string><string name="confirm">Review and Save</string><string name="type">Type</string>
+    <string name="amount">Amount</string><string name="currency">Currency</string><string name="purpose">Purpose</string><string name="category">Category</string><string name="account">Account</string>
+    <string name="date_time">Date and time</string><string name="note">Note</string><string name="cancel">Cancel</string><string name="save">Save</string><string name="delete">Delete</string><string name="edit">Edit</string>
+    <string name="required">Complete the amount and purpose before saving</string><string name="week">Week</string><string name="month">Month</string><string name="year">Year</string>
+    <string name="trend">Income and expense trend</string><string name="categories">Category breakdown</string><string name="analytics">Analytics</string><string name="accounts">Accounts</string>
+    <string name="week_spend">This week spent</string><string name="month_spend">This month spent</string><string name="year_spend">This year spent</string><string name="budget">Monthly budget</string>
+    <string name="used">Used</string><string name="remaining">Remaining</string><string name="over_budget">Over budget</string><string name="set_budget">Set budget</string><string name="add_account">Add Account</string>
+    <string name="account_name">Account name</string><string name="account_type">Account type</string><string name="include_assets">Include in total assets</string><string name="archive">Archive</string>
+    <string name="sign_in">Sign in</string><string name="external_sign_in">External sign-in options</string><string name="signed_in">Signed in</string><string name="settings">Settings</string><string name="sign_out">Sign out</string><string name="appearance">Appearance</string>
+    <string name="system">Follow System</string><string name="light">Light</string><string name="dark">Dark</string><string name="text_size">Text size</string><string name="language">Language</string>
+    <string name="small">Small</string><string name="standard">Standard</string><string name="large">Large</string><string name="extra_large">Extra Large</string><string name="demo_login">Sign in</string>
+    <string name="google">Continue with Google</string><string name="wechat">Continue with WeChat</string><string name="phone">Continue with Phone Number</string><string name="email">Continue with Email</string>
+    <string name="provider_note">Authentication requires provider and backend configuration</string><string name="name">Display name</string><string name="contact">Email or phone</string><string name="continue_action">Continue</string>
+    <string name="top_category">Top category</string><string name="net">Balance</string><string name="no_data">Add transactions to see insights</string><string name="save_success">Transaction saved</string>
+    <string name="filters">Filters</string><string name="clear">Clear</string><string name="total_assets">Total assets</string><string name="close">Close</string>
+</resources>

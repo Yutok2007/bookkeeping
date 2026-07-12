@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?><resources>
+    <string name="home">Início</string><string name="chart">Gráficos</string><string name="report">Relatório</string><string name="profile">Perfil</string><string name="income">Receitas</string><string name="expense">Despesas</string><string name="balance">Saldo</string>
+    <string name="add_entry">Adicionar transação</string><string name="sentence">Entrada rápida</string><string name="manual">Entrada manual</string><string name="parse">Analisar</string><string name="save">Guardar</string><string name="cancel">Cancelar</string><string name="purpose">Finalidade</string><string name="category">Categoria</string><string name="account">Conta</string>
+    <string name="week">Semana</string><string name="month">Mês</string><string name="year">Ano</string><string name="analytics">Análises</string><string name="accounts">Contas</string><string name="budget">Orçamento mensal</string><string name="settings">Definições</string><string name="language">Idioma</string><string name="currency">Moeda</string>
+</resources>

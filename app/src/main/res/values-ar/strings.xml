@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?><resources>
+    <string name="home">الرئيسية</string><string name="chart">الرسوم</string><string name="report">التقرير</string><string name="profile">الملف</string><string name="income">الدخل</string><string name="expense">المصروف</string><string name="balance">الرصيد</string>
+    <string name="add_entry">إضافة معاملة</string><string name="sentence">إدخال سريع</string><string name="manual">إدخال يدوي</string><string name="parse">تحليل</string><string name="save">حفظ</string><string name="cancel">إلغاء</string><string name="purpose">الغرض</string><string name="category">الفئة</string><string name="account">الحساب</string>
+    <string name="week">أسبوع</string><string name="month">شهر</string><string name="year">سنة</string><string name="analytics">التحليلات</string><string name="accounts">الحسابات</string><string name="budget">الميزانية الشهرية</string><string name="settings">الإعدادات</string><string name="language">اللغة</string><string name="currency">العملة</string>
+</resources>
