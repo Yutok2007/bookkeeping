@@ -13,6 +13,11 @@ import org.json.JSONObject
 import java.time.Instant
 
 class LedgerRepository(context: Context) {
+    companion object {
+        private const val BACKUP_FORMAT = "pocket-ledger-backup"
+        private const val BACKUP_VERSION = 1
+    }
+
     private val preferences = context.getSharedPreferences("pocket_ledger", Context.MODE_PRIVATE)
     private val dao = PocketLedgerDatabase.getInstance(context).ledgerDao()
     private val writeMutex = Mutex()
@@ -39,7 +44,7 @@ class LedgerRepository(context: Context) {
             preferences.edit().putString("state", encode(imported).toString()).putBoolean("room_import_complete", true).apply()
             return imported
         }
-        val roomState = readRoomState(legacy?.settings ?: AppSettings(), UserProfile())
+        val roomState = readRoomState(legacy?.settings ?: AppSettings())
         return if (roomState.categories.isEmpty()) {
             roomState.copy(categories = defaultCategories()).also { saveToRoom(it) }
         } else roomState
@@ -63,8 +68,42 @@ class LedgerRepository(context: Context) {
             entries = resolvedEntries,
             accounts = accounts,
             categories = categories,
-            profile = UserProfile(),
         )
+    }
+
+    fun exportBackup(state: StoredState): String = JSONObject().apply {
+        put("format", BACKUP_FORMAT)
+        put("version", BACKUP_VERSION)
+        put("exportedAt", Instant.now().toEpochMilli())
+        put("data", encode(state))
+    }.toString(2)
+
+    suspend fun importBackup(raw: String): StoredState = writeMutex.withLock {
+        withContext(Dispatchers.IO) {
+            val root = JSONObject(raw)
+            require(root.optString("format") == BACKUP_FORMAT) { "This is not a Pocket Ledger backup file." }
+            val version = root.optInt("version", 0)
+            require(version in 1..BACKUP_VERSION) { "This backup version is not supported by this app." }
+            val data = root.optJSONObject("data") ?: error("The backup file does not contain ledger data.")
+            require(data.has("entries") && data.has("accounts") && data.has("categories")) { "The backup file is incomplete." }
+            val restored = prepareForRoom(decode(data))
+            validateBackup(restored)
+            saveToRoom(restored)
+            preferences.edit()
+                .putString("state", encode(restored).toString())
+                .putBoolean("room_import_complete", true)
+                .apply()
+            restored
+        }
+    }
+
+    private fun validateBackup(state: StoredState) {
+        require(state.entries.map { it.id }.distinct().size == state.entries.size) { "The backup contains duplicate transaction IDs." }
+        require(state.accounts.map { it.id }.distinct().size == state.accounts.size) { "The backup contains duplicate account IDs." }
+        require(state.categories.map { it.id }.distinct().size == state.categories.size) { "The backup contains duplicate category IDs." }
+        require(state.entries.all { it.amount.isFinite() && it.amount >= 0.0 }) { "The backup contains an invalid transaction amount." }
+        require(state.accounts.all { it.balance.isFinite() && it.initialBalance.isFinite() }) { "The backup contains an invalid account balance." }
+        require(state.budget.total.isFinite() && state.budget.categoryAmounts.values.all(Double::isFinite)) { "The backup contains an invalid budget." }
     }
 
     private fun initialState(): StoredState {
@@ -96,7 +135,7 @@ class LedgerRepository(context: Context) {
         )
     }
 
-    private suspend fun readRoomState(settings: AppSettings, profile: UserProfile): StoredState {
+    private suspend fun readRoomState(settings: AppSettings): StoredState {
         val categories = dao.getCategories().map { it.toModel() }
         val budgets = dao.getBudgets()
         val total = budgets.firstOrNull { it.categoryId == null }
@@ -112,7 +151,6 @@ class LedgerRepository(context: Context) {
                 currency = budgetCurrency,
             ),
             settings = settings,
-            profile = profile,
         )
     }
 
@@ -163,9 +201,6 @@ class LedgerRepository(context: Context) {
             put("theme", state.settings.theme.name); put("textSize", state.settings.textSize.name)
             put("currency", state.settings.currency); put("language", state.settings.language)
         })
-        put("profile", JSONObject().apply {
-            put("id", state.profile.id); put("name", state.profile.name); put("contact", state.profile.contact); put("provider", state.profile.provider)
-        })
     }
 
     private fun decode(json: JSONObject): StoredState {
@@ -174,7 +209,6 @@ class LedgerRepository(context: Context) {
         val categories = json.optJSONArray("categories") ?: JSONArray()
         val budget = json.optJSONObject("budget") ?: JSONObject()
         val settings = json.optJSONObject("settings") ?: JSONObject()
-        val profile = json.optJSONObject("profile") ?: JSONObject()
         val categoryJson = budget.optJSONObject("categories") ?: JSONObject()
         return StoredState(
             entries = (0 until entries.length()).map { jsonToEntry(entries.getJSONObject(it)) },
@@ -182,7 +216,6 @@ class LedgerRepository(context: Context) {
             categories = (0 until categories.length()).map { jsonToCategory(categories.getJSONObject(it)) },
             budget = Budget(budget.optDouble("total", 5000.0), categoryJson.keys().asSequence().associateWith { categoryJson.optDouble(it) }, budget.optString("currency", "CNY")),
             settings = AppSettings(enumValueOrDefault(settings.optString("theme"), ThemeMode.SYSTEM), enumValueOrDefault(settings.optString("textSize"), TextSize.STANDARD), settings.optString("currency", "CNY"), settings.optString("language", "zh-TW")),
-            profile = UserProfile(profile.optString("id", "local"), profile.optString("name"), profile.optString("contact"), profile.optString("provider")),
         )
     }
 

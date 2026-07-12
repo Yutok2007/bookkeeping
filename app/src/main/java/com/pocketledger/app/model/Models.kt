@@ -59,13 +59,6 @@ data class Budget(
     val currency: String = "CNY",
 )
 
-data class UserProfile(
-    val id: String = "local",
-    val name: String = "",
-    val contact: String = "",
-    val provider: String = "",
-)
-
 data class AppSettings(
     val theme: ThemeMode = ThemeMode.SYSTEM,
     val textSize: TextSize = TextSize.STANDARD,
@@ -79,7 +72,6 @@ data class StoredState(
     val categories: List<LedgerCategory> = emptyList(),
     val budget: Budget = Budget(),
     val settings: AppSettings = AppSettings(),
-    val profile: UserProfile = UserProfile(),
 )
 
 val expenseCategories = listOf("Food", "Health", "Education", "Transport", "Shopping", "Entertainment", "Housing", "Travel", "Communication", "Subscriptions", "Other")

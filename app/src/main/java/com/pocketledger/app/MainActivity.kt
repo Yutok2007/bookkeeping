@@ -5,8 +5,10 @@ package com.pocketledger.app
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -75,7 +77,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-private enum class MainPage { HOME, CHART, REPORT, PROFILE }
+private enum class MainPage { HOME, CHART, REPORT, SETTINGS }
 
 @Composable
 private fun LedgerRoot(viewModel: LedgerViewModel = viewModel()) {
@@ -107,7 +109,7 @@ private fun LedgerRoot(viewModel: LedgerViewModel = viewModel()) {
                                 MainPage.HOME -> HomeScreen(viewModel, state, onEdit = { editing = it })
                                 MainPage.CHART -> ChartScreen(viewModel, state)
                                 MainPage.REPORT -> ReportScreen(viewModel, state)
-                                MainPage.PROFILE -> ProfileScreen(viewModel, state)
+                                MainPage.SETTINGS -> SettingsScreen(viewModel, state)
                             }
                         }
                     }
@@ -139,7 +141,7 @@ private fun MainNavigation(page: MainPage, language: String, onPage: (MainPage) 
             }
         )
         NavItem(page == MainPage.REPORT, "≡", tr(language, "report")) { onPage(MainPage.REPORT) }
-        NavItem(page == MainPage.PROFILE, "●", tr(language, "profile")) { onPage(MainPage.PROFILE) }
+        NavItem(page == MainPage.SETTINGS, "⚙", tr(language, "settings")) { onPage(MainPage.SETTINGS) }
     }
 }
 
@@ -922,23 +924,12 @@ private fun AccountDeleteDialog(
 }
 
 @Composable
-private fun ProfileScreen(viewModel: LedgerViewModel, state: LedgerUiState) {
+private fun SettingsScreen(viewModel: LedgerViewModel, state: LedgerUiState) {
     val language = state.data.settings.language
-    var loginDialog by remember { mutableStateOf(false) }
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 28.dp)) {
-        item { PageHeader(tr(language, "profile"), tr(language, "provider_note")) }
-        item {
-            Card(Modifier.fillMaxWidth().padding(horizontal = 16.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = .65f))) {
-                Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Text(tr(language, "external_sign_in"), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                    Text(tr(language, "provider_note"), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    OutlinedButton(onClick = { loginDialog = true }, modifier = Modifier.fillMaxWidth()) { Text(tr(language, "external_sign_in")) }
-                }
-            }
-        }
+        item { PageHeader(tr(language, "settings"), tr(language, "backup_restore")) }
         item { SettingsSection(viewModel, state) }
     }
-    if (loginDialog) LoginDialog(language, onDismiss = { loginDialog = false })
 }
 
 @Composable
@@ -947,8 +938,14 @@ private fun SettingsSection(viewModel: LedgerViewModel, state: LedgerUiState) {
     val language = settings.language
     val context = LocalContext.current
     var manageCategories by remember { mutableStateOf(false) }
+    var confirmImport by remember { mutableStateOf(false) }
+    val exportBackupLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
+        uri?.let(viewModel::exportBackup)
+    }
+    val importBackupLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        uri?.let(viewModel::importBackup)
+    }
     Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
-        Text(tr(language, "settings"), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
         Text(tr(language, "appearance"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
         SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
             ThemeMode.entries.forEachIndexed { index, mode ->
@@ -973,6 +970,17 @@ private fun SettingsSection(viewModel: LedgerViewModel, state: LedgerUiState) {
         HorizontalDivider()
         FilledTonalButton(onClick = { manageCategories = true }, modifier = Modifier.fillMaxWidth()) { Text("Manage Categories") }
         Text("Manage Accounts: Report → Accounts", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        HorizontalDivider()
+        Text(tr(language, "backup_restore"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+        Button(
+            onClick = {
+                val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmm"))
+                exportBackupLauncher.launch("PocketLedger-backup-$timestamp.json")
+            },
+            modifier = Modifier.fillMaxWidth(),
+        ) { Text(tr(language, "export_backup")) }
+        OutlinedButton(onClick = { confirmImport = true }, modifier = Modifier.fillMaxWidth()) { Text(tr(language, "import_backup")) }
+        Text(tr(language, "backup_note"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         OutlinedButton(onClick = {
             val share = Intent(Intent.ACTION_SEND).apply {
                 type = "text/csv"
@@ -980,14 +988,28 @@ private fun SettingsSection(viewModel: LedgerViewModel, state: LedgerUiState) {
                 putExtra(Intent.EXTRA_TEXT, exportLedgerCsv(state.data.entries))
             }
             runCatching { context.startActivity(Intent.createChooser(share, "Export Pocket Ledger data")) }
-        }, modifier = Modifier.fillMaxWidth()) { Text("Data Export (CSV)") }
+        }, modifier = Modifier.fillMaxWidth()) { Text(tr(language, "export_csv")) }
         Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = .5f))) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("Privacy & data", fontWeight = FontWeight.Bold)
-                Text("Your ledger is stored only on this device. Android backup is enabled for app preferences.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text("Pocket Ledger 1.0.0", style = MaterialTheme.typography.labelSmall)
+                Text(tr(language, "privacy_data"), fontWeight = FontWeight.Bold)
+                Text(tr(language, "local_data_note"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("Pocket Ledger ${BuildConfig.VERSION_NAME}", style = MaterialTheme.typography.labelSmall)
             }
         }
+    }
+    if (confirmImport) {
+        AlertDialog(
+            onDismissRequest = { confirmImport = false },
+            title = { Text(tr(language, "import_backup")) },
+            text = { Text(tr(language, "import_warning")) },
+            confirmButton = {
+                Button(onClick = {
+                    confirmImport = false
+                    importBackupLauncher.launch(arrayOf("application/json", "text/plain", "application/octet-stream"))
+                }) { Text(tr(language, "continue_import")) }
+            },
+            dismissButton = { TextButton(onClick = { confirmImport = false }) { Text(tr(language, "cancel")) } },
+        )
     }
     if (manageCategories) CategoryManagerDialog(viewModel, state, onDismiss = { manageCategories = false })
 }
@@ -1121,52 +1143,6 @@ private fun CategoryDeleteDialog(
         confirmButton = {},
         dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
     )
-}
-
-@Composable
-private fun LoginDialog(language: String, onDismiss: () -> Unit) {
-    var provider by remember { mutableStateOf("") }
-    var authMode by remember { mutableStateOf("Login") }
-    var countryCode by remember { mutableStateOf("+86") }
-    var contact by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var verificationCode by remember { mutableStateOf("") }
-    Dialog(onDismissRequest = onDismiss) {
-        Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(28.dp)) {
-            Column(Modifier.verticalScroll(rememberScrollState()).padding(22.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text(tr(language, "sign_in"), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-                Text("Authentication is not configured in this build. No fake token or successful login will be created.", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                listOf("Google" to "google", "WeChat" to "wechat", "Phone" to "phone", "Email" to "email").forEach { (value, key) ->
-                    OutlinedButton(onClick = { provider = value }, modifier = Modifier.fillMaxWidth(), colors = if (provider == value) ButtonDefaults.outlinedButtonColors(containerColor = MaterialTheme.colorScheme.primaryContainer) else ButtonDefaults.outlinedButtonColors()) {
-                        Text(tr(language, key))
-                    }
-                }
-                when (provider) {
-                    "Google" -> Text("Requires Google OAuth Client ID, SHA certificate fingerprints, redirect URI, and a backend token-verification endpoint.", style = MaterialTheme.typography.bodySmall)
-                    "WeChat" -> Text("Requires a WeChat Open Platform App ID, App Secret stored on a backend, universal link, redirect URI, and server-side code exchange.", style = MaterialTheme.typography.bodySmall)
-                    "Phone" -> {
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            OutlinedTextField(countryCode, { countryCode = it }, label = { Text("Country code") }, modifier = Modifier.weight(.7f), singleLine = true)
-                            OutlinedTextField(contact, { contact = it }, label = { Text("Phone number") }, modifier = Modifier.weight(1.3f), singleLine = true)
-                        }
-                        OutlinedTextField(verificationCode, { verificationCode = it }, label = { Text("Verification code") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
-                        Text("Requires an SMS provider and backend endpoints to send and verify one-time codes.", style = MaterialTheme.typography.bodySmall)
-                    }
-                    "Email" -> {
-                        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                            listOf("Register", "Login", "Forgot Password", "Reset Password").forEach { mode -> FilterChip(selected = authMode == mode, onClick = { authMode = mode }, label = { Text(mode) }) }
-                        }
-                        OutlinedTextField(contact, { contact = it }, label = { Text("Email") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
-                        if (authMode != "Forgot Password") OutlinedTextField(password, { password = it }, label = { Text(if (authMode == "Reset Password") "New password" else "Password") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
-                        if (authMode == "Reset Password") OutlinedTextField(verificationCode, { verificationCode = it }, label = { Text("Reset code") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
-                        Text("Requires email delivery, password hashing, reset-token storage, and authenticated backend endpoints.", style = MaterialTheme.typography.bodySmall)
-                    }
-                }
-                if (provider.isNotBlank()) Button(onClick = {}, enabled = false, modifier = Modifier.fillMaxWidth()) { Text("Requires external configuration") }
-                TextButton(onClick = onDismiss, modifier = Modifier.align(Alignment.End)) { Text(tr(language, "cancel")) }
-            }
-        }
-    }
 }
 
 @Composable

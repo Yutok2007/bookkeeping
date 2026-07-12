@@ -12,11 +12,13 @@
     <string name="week_spend">This week spent</string><string name="month_spend">This month spent</string><string name="year_spend">This year spent</string><string name="budget">Monthly budget</string>
     <string name="used">Used</string><string name="remaining">Remaining</string><string name="over_budget">Over budget</string><string name="set_budget">Set budget</string><string name="add_account">Add Account</string>
     <string name="account_name">Account name</string><string name="account_type">Account type</string><string name="include_assets">Include in total assets</string><string name="archive">Archive</string>
-    <string name="sign_in">Sign in</string><string name="external_sign_in">External sign-in options</string><string name="signed_in">Signed in</string><string name="settings">Settings</string><string name="sign_out">Sign out</string><string name="appearance">Appearance</string>
+    <string name="settings">Settings</string><string name="appearance">Appearance</string>
     <string name="system">Follow System</string><string name="light">Light</string><string name="dark">Dark</string><string name="text_size">Text size</string><string name="language">Language</string>
-    <string name="small">Small</string><string name="standard">Standard</string><string name="large">Large</string><string name="extra_large">Extra Large</string><string name="demo_login">Sign in</string>
-    <string name="google">Continue with Google</string><string name="wechat">Continue with WeChat</string><string name="phone">Continue with Phone Number</string><string name="email">Continue with Email</string>
-    <string name="provider_note">Authentication requires provider and backend configuration</string><string name="name">Display name</string><string name="contact">Email or phone</string><string name="continue_action">Continue</string>
+    <string name="small">Small</string><string name="standard">Standard</string><string name="large">Large</string><string name="extra_large">Extra Large</string><string name="continue_action">Continue</string>
     <string name="top_category">Top category</string><string name="net">Balance</string><string name="no_data">Add transactions to see insights</string><string name="save_success">Transaction saved</string>
     <string name="filters">Filters</string><string name="clear">Clear</string><string name="total_assets">Total assets</string><string name="close">Close</string>
+    <string name="backup_restore">Backup and restore</string><string name="export_backup">Export complete backup</string><string name="import_backup">Import backup</string><string name="export_csv">Export transactions as CSV</string>
+    <string name="backup_note">The complete JSON backup restores transactions, accounts, categories, budgets, and settings on another device. CSV is for viewing only and cannot be restored.</string>
+    <string name="import_warning">Importing a backup will replace all current transactions, accounts, categories, budgets, and settings on this device.</string><string name="continue_import">Replace and import</string>
+    <string name="privacy_data">Privacy and data</string><string name="local_data_note">Your ledger stays on this device unless you export a backup file yourself.</string>
 </resources>

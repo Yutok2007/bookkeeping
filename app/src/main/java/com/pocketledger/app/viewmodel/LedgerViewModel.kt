@@ -1,6 +1,7 @@
 package com.pocketledger.app.viewmodel
 
 import android.app.Application
+import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.pocketledger.app.data.LedgerRepository
@@ -9,6 +10,8 @@ import com.pocketledger.app.parser.NaturalLanguageParser
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.time.*
 import kotlinx.coroutines.launch
 
@@ -159,6 +162,44 @@ class LedgerViewModel(application: Application) : AndroidViewModel(application) 
     fun updateSettings(transform: (AppSettings) -> AppSettings) {
         val data = _uiState.value.data
         persist(data.copy(settings = transform(data.settings)))
+    }
+
+    fun exportBackup(uri: Uri) {
+        val snapshot = _uiState.value.data
+        viewModelScope.launch {
+            runCatching {
+                val contents = repository.exportBackup(snapshot)
+                withContext(Dispatchers.IO) {
+                    val resolver = getApplication<Application>().contentResolver
+                    resolver.openOutputStream(uri, "wt")?.bufferedWriter(Charsets.UTF_8)?.use { it.write(contents) }
+                        ?: error("The selected file could not be opened.")
+                }
+            }.onSuccess {
+                _uiState.value = _uiState.value.copy(userMessage = "Backup exported successfully.")
+            }.onFailure {
+                _uiState.value = _uiState.value.copy(userMessage = "Unable to export backup: ${it.message ?: "unknown error"}")
+            }
+        }
+    }
+
+    fun importBackup(uri: Uri) {
+        viewModelScope.launch {
+            runCatching {
+                val contents = withContext(Dispatchers.IO) {
+                    val resolver = getApplication<Application>().contentResolver
+                    resolver.openInputStream(uri)?.bufferedReader(Charsets.UTF_8)?.use { it.readText() }
+                        ?: error("The selected file could not be opened.")
+                }
+                repository.importBackup(contents)
+            }.onSuccess { restored ->
+                _uiState.value = LedgerUiState(
+                    data = restored,
+                    userMessage = "Backup restored successfully: ${restored.entries.size} transactions.",
+                )
+            }.onFailure {
+                _uiState.value = _uiState.value.copy(userMessage = "Unable to restore backup: ${it.message ?: "invalid file"}")
+            }
+        }
     }
 
     fun setSearch(value: String) { _uiState.value = _uiState.value.copy(search = value) }

@@ -26,11 +26,9 @@ private val en = mapOf(
     "week_spend" to "This week spent", "month_spend" to "This month spent", "year_spend" to "This year spent", "budget" to "Monthly budget",
     "used" to "Used", "remaining" to "Remaining", "over_budget" to "Over budget", "set_budget" to "Set budget", "add_account" to "Add account",
     "account_name" to "Account name", "account_type" to "Account type", "include_assets" to "Include in total assets", "archive" to "Archive",
-    "sign_in" to "Sign in", "signed_in" to "Signed in", "settings" to "Settings", "sign_out" to "Sign out", "appearance" to "Appearance",
+    "settings" to "Settings", "appearance" to "Appearance",
     "system" to "System", "light" to "Light", "dark" to "Dark", "text_size" to "Text size", "language" to "Language",
-    "small" to "Small", "standard" to "Standard", "large" to "Large", "extra_large" to "Extra large", "demo_login" to "Demo sign-in",
-    "google" to "Continue with Google", "wechat" to "Continue with WeChat", "phone" to "Continue with phone", "email" to "Continue with email",
-    "provider_note" to "Authentication requires provider and backend configuration", "name" to "Display name", "contact" to "Email or phone", "continue" to "Continue",
+    "small" to "Small", "standard" to "Standard", "large" to "Large", "extra_large" to "Extra large", "continue" to "Continue",
     "top_category" to "Top category", "net" to "Net", "no_data" to "Add transactions to see insights", "save_success" to "Transaction saved",
     "filters" to "Filters", "clear" to "Clear", "total_assets" to "Total assets", "close" to "Close"
 )
@@ -48,10 +46,9 @@ private val bundles = mapOf(
         "week" to "週", "month" to "月", "year" to "年", "trend" to "收支趨勢", "categories" to "分類統計", "analytics" to "分析", "accounts" to "帳戶",
         "week_spend" to "本週消費", "month_spend" to "本月消費", "year_spend" to "本年消費", "budget" to "每月預算", "used" to "已使用", "remaining" to "剩餘", "over_budget" to "已超出預算",
         "set_budget" to "設定預算", "add_account" to "新增帳戶", "account_name" to "帳戶名稱", "account_type" to "帳戶類型", "include_assets" to "計入總資產", "archive" to "封存",
-        "sign_in" to "登入", "signed_in" to "已登入", "settings" to "設定", "sign_out" to "登出", "appearance" to "外觀", "system" to "跟隨系統", "light" to "亮色", "dark" to "暗色",
-        "text_size" to "文字大小", "language" to "語言", "small" to "小", "standard" to "標準", "large" to "大", "extra_large" to "特大", "demo_login" to "示範登入",
-        "google" to "使用 Google 登入", "wechat" to "使用微信登入", "phone" to "使用手機號碼登入", "email" to "使用電子郵件登入", "provider_note" to "登入需要服務商與後端配置",
-        "name" to "顯示名稱", "contact" to "電子郵件或手機號碼", "continue" to "繼續", "top_category" to "最高分類", "net" to "淨餘額", "no_data" to "新增帳目後即可查看分析", "save_success" to "帳目已保存",
+        "settings" to "設定", "appearance" to "外觀", "system" to "跟隨系統", "light" to "亮色", "dark" to "暗色",
+        "text_size" to "文字大小", "language" to "語言", "small" to "小", "standard" to "標準", "large" to "大", "extra_large" to "特大",
+        "continue" to "繼續", "top_category" to "最高分類", "net" to "淨餘額", "no_data" to "新增帳目後即可查看分析", "save_success" to "帳目已保存",
         "filters" to "篩選", "clear" to "清除", "total_assets" to "總資產", "close" to "關閉"
     ),
     "zh-CN" to translated(
@@ -60,7 +57,7 @@ private val bundles = mapOf(
         "sentence" to "一句话记账", "manual" to "手动记账", "parse" to "解析", "speak" to "语音", "confirm" to "确认并保存", "type" to "类型", "amount" to "金额", "currency" to "货币",
         "purpose" to "用途", "category" to "分类", "account" to "账户", "date_time" to "日期与时间", "note" to "备注", "cancel" to "取消", "save" to "保存", "delete" to "删除", "edit" to "修改",
         "week" to "周", "month" to "月", "year" to "年", "trend" to "收支趋势", "categories" to "分类统计", "analytics" to "分析", "accounts" to "账户", "budget" to "每月预算",
-        "used" to "已使用", "remaining" to "剩余", "set_budget" to "设置预算", "add_account" to "新增账户", "settings" to "设置", "sign_in" to "登录", "sign_out" to "退出登录", "provider_note" to "登录需要服务商与后端配置",
+        "used" to "已使用", "remaining" to "剩余", "set_budget" to "设置预算", "add_account" to "新增账户", "settings" to "设置",
         "appearance" to "外观", "system" to "跟随系统", "light" to "浅色", "dark" to "深色", "text_size" to "文字大小", "language" to "语言", "close" to "关闭"
     ),
     "ja" to translated("home" to "ホーム", "chart" to "チャート", "report" to "レポート", "profile" to "プロフィール", "income" to "収入", "expense" to "支出", "balance" to "残高", "add_entry" to "取引を追加", "sentence" to "一文で入力", "manual" to "手動入力", "parse" to "解析", "save" to "保存", "cancel" to "キャンセル", "week" to "週", "month" to "月", "year" to "年", "analytics" to "分析", "accounts" to "口座", "budget" to "月間予算", "settings" to "設定", "language" to "言語", "currency" to "通貨"),
